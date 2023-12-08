@@ -1,15 +1,23 @@
 from tkinter import *
 from tkinter.filedialog import askopenfilename, askdirectory
 from tkinter import messagebox
-from patoolib import extract_archive
-import os
+# from patoolib import extract_archive
+from pyunpack import Archive
+import os,sys
+
+def resource_path(path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, path)
 
 # creating the window ↓↓↓
 win = Tk()
 win.geometry("400x270")
 win.title("Artin Zip Extractor")
 win.resizable(0,0)
-win.iconbitmap("./logo.ico")
+win.iconbitmap(resource_path("./logo.ico"))
 win.configure(bg="hotpink")
 forbidden_characters = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
 
@@ -31,7 +39,8 @@ def extract():
                 if not os.path.exists(destination):
                     os.makedirs(destination)
                 try:
-                    extract_archive(zip_file, outdir=destination)
+                    # extract_archive(zip_file, outdir=destination)
+                    Archive(zip_file).extractall(destination)
                     if name_input.get():
                         os.rename(f"{destination}/{file_name}", f"{destination}/{name_input.get()}")
                         messagebox.showinfo(title="Zip File", message="Your file extracted successfuly!")
@@ -48,12 +57,12 @@ def extract():
             name_input.delete(0,"end")
             messagebox.showerror(title="Zip File", message="output name is not suitable")
             return
+        zip_file_path = loc
+        destination = askdirectory(initialdir="where to", title="save")
+        extract(zip_file_path, destination)
     else:
         messagebox.showerror(title="Zip File", message="please choose your zipfile first")
 
-    zip_file_path = loc
-    destination = askdirectory(initialdir="where to", title="save")
-    extract(zip_file_path, destination)
 
 
 
